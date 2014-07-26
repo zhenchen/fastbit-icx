@@ -55,7 +55,7 @@ const ibis::bitvector::word_t ibis::bitvector::HEADER_FLF_ICX =
 const ibis::bitvector::word_t ibis::bitvector::HEADER_0NL2_F_ICX = 
 (9U << (ibis::bitvector::MAXBITS - 3));
 const ibis::bitvector::word_t ibis::bitvector::HEADER_L_F_ICX = 
-(1U << (ibis::bitvector::MAXBITS - 4));
+(17U << (ibis::bitvector::MAXBITS - 4));
 
 const ibis::bitvector::word_t ibis::bitvector::ICX_0_DIRTYMASK4 = 
 (255U<<24);
@@ -321,7 +321,6 @@ void ibis::bitvector::compress_icx() {
 	bool	isDirty1;
 	int dirtyPos1;
 	int isDirty2_0;		//used for ICX(case for 0N2L-F)
-	int isDirty2_1;
 	int dirtyPos2_0;
 	int dirtyPos2_1;
 	bool changed;
@@ -335,10 +334,10 @@ void ibis::bitvector::compress_icx() {
 
 		if(isFill) 
 		{
-			*it = *it & 0x0fffffff;
+			*it = *it & 0x03ffffff;
 			if(fillBit) 
 			{
-				*it = *it | 0x90000000;
+				*it = *it | 0x84000000;
 			}
 			else  
 			{
@@ -357,7 +356,7 @@ void ibis::bitvector::compress_icx() {
 			//dirtyPos1 = ((int)(bool)(*it & ICX_1_DIRTYMASK4) << 3 )+ ((int)(bool)(*it & ICX_1_DIRTYMASK3) << 2) + ((int)(bool)(*it & ICX_1_DIRTYMASK2) << 1 ) + ((int)(bool)(*it & ICX_1_DIRTYMASK1));   // More efficient
 			dirtyPos1 = ((int)(bool)(~(*it) & ICX_1_DIRTYMASK4) << 3 )+ ((int)(bool)(~(*it) & ICX_0_DIRTYMASK3) << 2) + ((int)(bool)(~(*it) & ICX_0_DIRTYMASK2) << 1 ) + ((int)(bool)(~(*it) & ICX_0_DIRTYMASK1));   // More efficient
 			isDirty2_0 =( (int)(bool)(*it & ICX_0_DIRTYMASK1)+(int)(bool)(*it & ICX_0_DIRTYMASK2)+(int)(bool)(*it & ICX_0_DIRTYMASK3)+(int)(bool)(*it & ICX_1_DIRTYMASK4) == 2 );		
-			isDirty2_1 =( (int)(bool)(~(*it) & ICX_0_DIRTYMASK1)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK2)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK3)+(int)(bool)(~(*it) & ICX_1_DIRTYMASK4) == 2 );
+			//isDirty2_1 =( (int)(bool)(~(*it) & ICX_0_DIRTYMASK1)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK2)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK3)+(int)(bool)(~(*it) & ICX_1_DIRTYMASK4) == 2 );
 			if(isDirty2_0)
 			{
 				isDirty1 = 1;
@@ -402,7 +401,7 @@ void ibis::bitvector::compress_icx() {
 					}
 				}
 			}
-			if(isDirty2_1)
+			/*if(isDirty2_1)
 			{
 				if(~(*it) > 0x00ffffff)
 				{
@@ -443,7 +442,7 @@ void ibis::bitvector::compress_icx() {
 					dirtyPos2_1 = 1;
 				}
 			}
-		}
+		}*/
 	 }
 		
 
@@ -464,7 +463,7 @@ void ibis::bitvector::compress_icx() {
 		}*/
 		unsigned int tmp;
 		tmp = *it;
-		if(((tmp) & 0x90000000 ) == 0x80000000)
+		if(((tmp) & 0x84000000 ) == 0x80000000)
 		{
 			isFill = 1;
 			fillBit = 0;
@@ -472,7 +471,7 @@ void ibis::bitvector::compress_icx() {
 		}
 		else
 		{
-			if(((tmp) & 0x90000000) == 0x90000000)
+			if(((tmp) & 0x84000000) == 0x84000000)
 			{
 				isFill = 1;
 				fillBit = 1;
@@ -494,7 +493,7 @@ void ibis::bitvector::compress_icx() {
 			//dirtyPos1 = ((int)(bool)(*it & ICX_1_DIRTYMASK4) << 3 )+ ((int)(bool)(*it & ICX_1_DIRTYMASK3) << 2) + ((int)(bool)(*it & ICX_1_DIRTYMASK2) << 1 ) + ((int)(bool)(*it & ICX_1_DIRTYMASK1));   // More efficient
 			dirtyPos1 = ((int)(bool)(~(*it) & ICX_1_DIRTYMASK4) << 3 )+ ((int)(bool)(~(*it) & ICX_0_DIRTYMASK3) << 2) + ((int)(bool)(~(*it) & ICX_0_DIRTYMASK2) << 1 ) + ((int)(bool)(~(*it) & ICX_0_DIRTYMASK1));   // More efficient
 			isDirty2_0 =( (int)(bool)(*it & ICX_0_DIRTYMASK1)+(int)(bool)(*it & ICX_0_DIRTYMASK2)+(int)(bool)(*it & ICX_0_DIRTYMASK3)+(int)(bool)(*it & ICX_1_DIRTYMASK4) == 2 );		
-			isDirty2_1 =( (int)(bool)(~(*it) & ICX_0_DIRTYMASK1)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK2)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK3)+(int)(bool)(~(*it) & ICX_1_DIRTYMASK4) == 2 );
+			//isDirty2_1 =( (int)(bool)(~(*it) & ICX_0_DIRTYMASK1)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK2)+(int)(bool)(~(*it) & ICX_0_DIRTYMASK3)+(int)(bool)(~(*it) & ICX_1_DIRTYMASK4) == 2 );
 			if(isDirty2_0)
 			{
 				isDirty1 = 1;
@@ -502,13 +501,13 @@ void ibis::bitvector::compress_icx() {
 				if(*it > 0x00ffffff)
 				{
 					dirtyPos2_0 = 8;
-					if(*it - 0x00ffffff > 0x0000ffff)
+					if(((*it)& 0x00ffffff) > 0x0000ffff)
 					{
 						dirtyPos2_1 = 4;
 					}
 					else
 					{
-						if(*it - 0x0000ffff > 0x000000ff)
+						if(((*it)&0x0000ffff) > 0x000000ff)
 						{
 							dirtyPos2_1 = 2;
 						}
@@ -523,7 +522,7 @@ void ibis::bitvector::compress_icx() {
 					if(*it > 0x0000ffff)
 					{
 						dirtyPos2_0 = 4;
-						if(*it - 0x0000ffff > 0x000000ff)
+						if(((*it)& 0x0000ffff) > 0x000000ff)
 						{
 							dirtyPos2_1 = 2;
 						}
@@ -539,7 +538,7 @@ void ibis::bitvector::compress_icx() {
 					}
 				}
 			}
-			if(isDirty2_1)
+			/*if(isDirty2_1)
 			{
 				if(~(*it) > 0x00ffffff)
 				{
@@ -573,14 +572,14 @@ void ibis::bitvector::compress_icx() {
 						{
 							dirtyPos2_1 = 1;
 						}
+					}
+					else
+					{
+						dirtyPos2_0 = 2;
+						dirtyPos2_1 = 1;
+					}
 				}
-				else
-				{
-					dirtyPos2_0 = 2;
-					dirtyPos2_1 = 1;
-				}
-			}
-		}
+			}*/
 		}
 		}
     };
@@ -597,7 +596,7 @@ void ibis::bitvector::compress_icx() {
     current.it = m_vec.begin();
     last.it = m_vec.begin();
 	beforeLast.it = m_vec.begin();
-	//current.decode();
+	current.decode();
 	//predeal, merge all fills. supposed to be finished by compress(), so do not need to repeat it.
 /*	for (++ current.it; current.it < m_vec.end(); ++ current.it) {
 	current.decode();
@@ -698,7 +697,7 @@ void ibis::bitvector::compress_icx() {
 			*(beforeLast.it) = *(last.it);
 			last.it++;
 			*(last.it) = *(current.it);
-		existBeforeLast = true;
+			existBeforeLast = true;
 	    }
 	}
 	else if (current.isFill) {
@@ -807,7 +806,7 @@ void ibis::bitvector::compress_icx() {
 								}
 							}
 							else{*/ 
-								if(((*(beforeLast.it)&0x0fffffff)>0x0000007f)||(((*(current.it))&0x0fffffff)>0x0000007f))  //Attention,because the codebook is changed, the value is also changed
+								if(((*(beforeLast.it)&0x03ffffff)>0x0000007f)||(((*(current.it))&0x03ffffff)>0x0000007f))  //Attention,because the codebook is changed, the value is also changed
 								{
 									beforeLast.it++;
 									*(beforeLast.it) = *(last.it);
@@ -912,7 +911,7 @@ void ibis::bitvector::compress_icx() {
 					}
 					else{*/
 						// LF cannot combine
-					    if(*(current.it) & 0x0fffffff > 0x0000007f)
+					    if((*(current.it) & 0x03ffffff) > 0x0000007f)
 						{
 							beforeLast.it++;
 							*(beforeLast.it) = *(last.it);
@@ -941,9 +940,9 @@ void ibis::bitvector::compress_icx() {
 			else{//LF
 				//fisrt L dirty	
 					//LFL fisrt F dirty
-						if(current.isDirty0^current.isDirty1)
+						if((current.isDirty0^current.isDirty1)&&(beforeLast.isDirty0^beforeLast.isDirty1))
 						{//LFL encoding!
-							if(((*last.it)&0x0fffffff)>0x0000007f)
+							if(((*last.it)&0x03ffffff)>0x0000007f)
 							{//counter not enough.
 								beforeLast.it++;
 								*(beforeLast.it) = *(last.it);
@@ -1017,7 +1016,7 @@ void ibis::bitvector::compress_icx() {
 							else
 							{//differnet type of fill and literal.
 							 // 0N2L-F/L-F
-								if(*(last.it) & 0x0fffffff > 0x0000007f)
+								if((*(last.it) & 0x03ffffff) > 0x0000007f)
 								{
 									beforeLast.it++;
 									*(beforeLast.it) = *(last.it);
@@ -1084,7 +1083,8 @@ void ibis::bitvector::compress_icx() {
 										}	 
 										*(beforeLast.it) += last.nWords;
 										*(beforeLast.it) += last.fillBit << 25;
-										*(beforeLast.it) += 1U << 27;
+										//*(beforeLast.it) += 1U << 27;
+										*(beforeLast.it) += HEADER_L_F_ICX;
 										*(last.it) = *(current.it);
 										beforeLast.it++;
 										last.it ++;
@@ -1106,7 +1106,72 @@ void ibis::bitvector::compress_icx() {
 			}
 		}
 	}
-	
+	beforeLast.decode2();
+	last.decode2();
+	if(beforeLast.isDirty0 && beforeLast.isDirty1)
+	{
+		if(last.isFill)
+		{
+			if((*(last.it) & 0x03ffffff) <= 0x0000007f)
+			{
+					*(last.it) = *(beforeLast.it);
+					*(beforeLast.it) = 0;
+					switch(beforeLast.dirtyPos2_0)
+					{
+					case 8: *(beforeLast.it) = ((*(last.it) & ICX_1_DIRTYMASK4) >> 16); *(beforeLast.it) += (3U << 26); break;
+					case 4: *(beforeLast.it) = ((*(last.it) & ICX_0_DIRTYMASK3)>> 8); *(beforeLast.it) += (2U <<26); break;
+					case 2: *(beforeLast.it) = (*(last.it) & ICX_0_DIRTYMASK2); *(beforeLast.it) += (1U <<26); break;
+					}
+					switch(beforeLast.dirtyPos2_1)
+					{
+					case 4: *(beforeLast.it) += ((*(last.it) & ICX_0_DIRTYMASK3) >> 16); *(beforeLast.it) += (2U << 24); break;
+					case 2: *(beforeLast.it) += ((*(last.it) & ICX_0_DIRTYMASK2)>> 8); *(beforeLast.it) += (1U <<24); break;
+					case 1: *(beforeLast.it) += (*(last.it) & ICX_0_DIRTYMASK1); break;
+					}
+					*(beforeLast.it) += last.nWords <<16;
+					*(beforeLast.it) += last.fillBit <<23;
+					*(beforeLast.it) += HEADER_0NL2_F_ICX;
+					existLast = false;
+			}				
+		}
+	}
+	else
+	{
+		if(beforeLast.isDirty0^beforeLast.isDirty1)
+		{
+			if((last.isFill)&& ((*(last.it)&0x03ffffff)<=0x0000007f))
+			{
+				if(beforeLast.isDirty0)
+				{
+					switch(beforeLast.dirtyPos0)
+					{
+						case 8: *(beforeLast.it) = (*(beforeLast.it) >> 16); *(beforeLast.it) += (3U << 23); break;
+						case 4: *(beforeLast.it) = (*(beforeLast.it) >> 8); *(beforeLast.it) += (2U << 23); break;
+						case 2: *(beforeLast.it) = (*(beforeLast.it)); *(beforeLast.it) += (1U << 23); break;
+						case 1: *(beforeLast.it) = (*(beforeLast.it) << 8); break;
+					}
+
+				}
+				else
+				{
+					switch(beforeLast.dirtyPos1)
+					{
+						case 8: *(beforeLast.it) = ((*(beforeLast.it) & ICX_1_DIRTYMASK4)>> 16); *(beforeLast.it) += (3U << 23); break;
+						case 4: *(beforeLast.it) = ((*(beforeLast.it) & ICX_0_DIRTYMASK3)>> 8); *(beforeLast.it) += (2U << 23); break;
+						case 2: *(beforeLast.it) = (*(beforeLast.it) & ICX_0_DIRTYMASK2); *(beforeLast.it) += (1U << 23); break;
+						case 1: *(beforeLast.it) = ((*(beforeLast.it) & ICX_0_DIRTYMASK1)<< 8); break;
+					}
+					*(beforeLast.it) += (1U << 26);
+				}	 
+					*(beforeLast.it) += last.nWords;
+					*(beforeLast.it) += last.fillBit << 25;
+					//*(beforeLast.it) += 1U << 27;
+					*(beforeLast.it) += HEADER_L_F_ICX;
+					existLast = false;
+			}
+		}
+		
+	}
 	if(existLast) last.it++;
 
 	if (last.it < m_vec.end()) { // reduce the size of m_vec
@@ -1135,53 +1200,53 @@ void ibis::bitvector::decompress_icx(int begin, int end)
 			dirtyByte1(0), dirtyByte2(0), dirtyBytePos1(0), dirtyBytePos2(0), counter1(0), counter2(0),it(0) {};
 		void decode() {
 			isLiteral = !(bool)(*it >> MAXBITS);       //0:literal;1:fill
-			icxType = (*it >> MAXBITS - 3) & 7;
+			icxType = ((*it) >> (MAXBITS - 3)) & 7;
 
 			if(!isLiteral)
 			{
 				if(icxType == 0)
 				{
-					if((*it & 0x08000000) >> (MAXBITS - 4) == 0)// 0-FILL or 1-FILL
+					if((((*it) & 0x08000000) >> (MAXBITS - 4)) == 0)// 0-FILL or 1-FILL
 					{
-						fillType1 = (*it & 0x04000000) >> (MAXBITS - 5);
-						counter1 = (*it & 0x03ffffff);
+						fillType1 = ((*it) & 0x04000000) >> (MAXBITS - 5);
+						counter1 = ((*it) & 0x03ffffff);
 					}
 					else //L-F
 					{
-						NILiteralType = (*it & 0x04000000) >> (MAXBITS - 5);
-						fillType1 = (*it & 0x02000000) >> (MAXBITS - 6);
-						dirtyBytePos1 = (*it & 0x01800000) >> (MAXBITS - 8);
-						dirtyByte1 = (*it & 0x0000ff00) >> (MAXBITS - 23);
-						counter1 = (*it & 0x000000ff);
+						NILiteralType = ((*it) & 0x04000000) >> (MAXBITS - 5);
+						fillType1 = ((*it) & 0x02000000) >> (MAXBITS - 6);
+						dirtyBytePos1 = ((*it) & 0x01800000) >> (MAXBITS - 8);
+						dirtyByte1 = ((*it) & 0x0000ff00) >> (MAXBITS - 23);
+						counter1 = ((*it) & 0x000000ff);
 					}
 				}
 				else if(icxType == 1) //0NL2-F
 				{
-					fillType1 = (bool)(*it & 0x00800000);
-					dirtyBytePos1 = (*it & 0x0c000000) >> (MAXBITS - 5);
-					dirtyBytePos2 = (*it & 0x03000000) >> (MAXBITS - 7);
-					dirtyByte1 = (*it & 0x0000ff00) >> (MAXBITS - 23);
-					dirtyByte2 = (*it & 0x000000ff);
-					counter1 = (*it & 0x00ff0000) >> (MAXBITS - 15);
+					fillType1 = (bool)((*it) & 0x00800000);
+					dirtyBytePos1 = ((*it) & 0x0c000000) >> (MAXBITS - 5);
+					dirtyBytePos2 = ((*it) & 0x03000000) >> (MAXBITS - 7);
+					dirtyByte1 = ((*it) & 0x0000ff00) >> (MAXBITS - 23);
+					dirtyByte2 = ((*it) & 0x000000ff);
+					counter1 = ((*it) & 0x007f0000) >> (MAXBITS - 15);
 				}
 				else if(icxType == 2 || icxType == 3 || icxType == 4 || icxType == 5) //LFL
 				{
-					fillType1 = (bool)(*it & 0x00800000);
-					dirtyBytePos1 = (*it & 0x0c000000) >> (MAXBITS - 5);
-					dirtyBytePos2 = (*it & 0x03000000) >> (MAXBITS - 7);
-					dirtyByte1 = (*it & 0x0000ff00) >> (MAXBITS - 23);
-					dirtyByte2 = (*it & 0x000000ff);
-					counter1 = (*it & 0x00ff0000) >> (MAXBITS - 15);
+					fillType1 = (bool)((*it) & 0x00800000);
+					dirtyBytePos1 = ((*it) & 0x0c000000) >> (MAXBITS - 5);
+					dirtyBytePos2 = ((*it) & 0x03000000) >> (MAXBITS - 7);
+					dirtyByte1 = ((*it) & 0x0000ff00) >> (MAXBITS - 23);
+					dirtyByte2 = ((*it) & 0x000000ff);
+					counter1 = ((*it) & 0x007f0000) >> (MAXBITS - 15);
 				}
 				else  //FLF
 				{
-					fillType1 = (bool)(*it & 0x10000000);
-					fillType2 = (bool)(*it & 0x04000000);
-					NILiteralType = (bool)(*it & 0x08000000);
-					dirtyBytePos1 = (*it & 0x03000000) >> (MAXBITS - 5);
-					dirtyByte1 = (*it & 0x0000ff00) >> (MAXBITS - 23);
-					counter1 = (*it & 0x00ff0000) >> (MAXBITS - 15);
-					counter2 = (*it & 0x000000ff);
+					fillType1 = (bool)((*it) & 0x10000000);
+					fillType2 = (bool)((*it) & 0x04000000);
+					NILiteralType = (bool)((*it) & 0x08000000);
+					dirtyBytePos1 = ((*it) & 0x03000000) >> (MAXBITS - 7);
+					dirtyByte1 = ((*it) & 0x0000ff00) >> (MAXBITS - 23);
+					counter1 = ((*it) & 0x00ff0000) >> (MAXBITS - 15);
+					counter2 = ((*it) & 0x000000ff);
 				}
 			}
 			else;
@@ -1192,21 +1257,21 @@ void ibis::bitvector::decompress_icx(int begin, int end)
 	xrun currentTmp;
 	//initialize new bitvector. At last m_vec would be replaced by tmp_vec.
 	
-	word_t wahLength = *(m_vec.begin());  // read length of wah.
+	word_t wahLength = (end - begin)/4;  // read length of wah.
 //	int cpxLength = m_vec.size();
 	
 //	std::cout<<"cpxLength"<<cpxLength<<std::endl;
 //	std::cout<<"m_vec.size"<<m_vec.size()<<std::endl;
 	
-	array_t<word_t> tmp_array(wahLength + 1,0);
+	array_t<word_t> tmp_array(wahLength - 1,0);
 
 	bitvector * tmp_vec = new bitvector(tmp_array);
 
 	currentTmp.it = tmp_vec->m_vec.begin();
 	current.it = m_vec.begin();
-	current.decode();
+	//current.decode();
 
-	for ( ++ current.it; current.it <m_vec.end(); ++ current.it)
+	for (current.it; current.it <m_vec.end(); ++ current.it)
 	{
 		current.decode();
 		std::cout<<"icxType:"<<current.icxType<<std::endl;
@@ -1219,7 +1284,7 @@ void ibis::bitvector::decompress_icx(int begin, int end)
 		{
 			if(current.icxType == 0)
 			{
-				if((*(current.it) & 0x08000000) >> (MAXBITS - 4) == 0)// 0-FILL or 1-FILL
+				if(((*(current.it) & 0x08000000) >> (MAXBITS - 4)) == 0)// 0-FILL or 1-FILL
 				{
 					*currentTmp.it = current.counter1;
 					if(current.fillType1 == 1) *currentTmp.it += 0x40000000;
@@ -1265,13 +1330,13 @@ void ibis::bitvector::decompress_icx(int begin, int end)
 					case 2: *currentTmp.it = (current.dirtyByte1 << 16);break;
 					case 3: *currentTmp.it = (current.dirtyByte1 << 24);break;
 				}
-				currentTmp.it ++;
+				//currentTmp.it ++;
 				switch(current.dirtyBytePos2)
 				{
-					case 0: *currentTmp.it = current.dirtyByte2;break;
-					case 1: *currentTmp.it = (current.dirtyByte2 << 8);break;
-					case 2: *currentTmp.it = (current.dirtyByte2 << 16);break;
-					case 3: *currentTmp.it = (current.dirtyByte2 << 24);break;
+					case 0: *currentTmp.it += current.dirtyByte2;break;
+					case 1: *currentTmp.it += (current.dirtyByte2 << 8);break;
+					case 2: *currentTmp.it += (current.dirtyByte2 << 16);break;
+					case 3: *currentTmp.it += (current.dirtyByte2 << 24);break;
 				}
 				currentTmp.it++;
 				*currentTmp.it = current.counter1;
@@ -3248,14 +3313,9 @@ void ibis::bitvector::write(int out){
     }
 #endif
     long ierr;
-    //const word_t n = sizeof(word_t) * m_vec.size();
-    //ierr = UnixWrite(out, (const void*)m_vec.begin(), n);
-    word_t n =  m_vec.size();
-	ierr = UnixWrite(out,(const void*)&n,sizeof(word_t));
-	compress_icx();
-	n = sizeof(word_t) * m_vec.size();
+    const word_t n = sizeof(word_t) * m_vec.size();
     ierr = UnixWrite(out, (const void*)m_vec.begin(), n);
-	if (ierr != (long) n) {
+    if (ierr != (long) n) {
 	LOGGER(ibis::gVerbose > 0)
 	    << "Warning -- bitvector::write only wrote " << ierr << " out of "
 	    << n << " bytes to open file " << out;
@@ -3338,8 +3398,6 @@ void ibis::bitvector::write(int out){
 	}
     }
 #endif
-	word_t vacant = 0x00000000;
-	appendWord(vacant);
 } // ibis::bitvector::write
 /*void ibis::bitvector::write(int out) {
     if (out < 0)
