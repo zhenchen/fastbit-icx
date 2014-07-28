@@ -1055,11 +1055,14 @@ void ibis::bitvector::compress_icx() {
 										else
 										{
 											*(last.it) = *(current.it);
+											last.decode();
 											//current.it--;
 										}
 									}
 									else
 									{//L-F
+										if(beforeLast.isDirty0 | beforeLast.isDirty1)
+										{
 										if(beforeLast.isDirty0)
 										{
 											switch(beforeLast.dirtyPos0)
@@ -1096,7 +1099,16 @@ void ibis::bitvector::compress_icx() {
 										else
 										{
 											*(last.it) = *(current.it);
+											last.decode();
 											//current.it--;
+										}
+									}
+										else
+										{
+											beforeLast.it++;
+											*(beforeLast.it) = *(last.it);
+											last.it++;
+											*(last.it) = *(current.it);
 										}
 									}
 								}
